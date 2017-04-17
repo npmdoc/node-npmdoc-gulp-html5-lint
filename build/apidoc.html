@@ -1,0 +1,228 @@
+<div class="apidocDiv">
+<style>
+/*csslint
+*/
+.apidocDiv {
+    background: #fff;
+    font-family: Arial, Helvetica, sans-serif;
+}
+.apidocDiv a[href] {
+    color: #33f;
+    font-weight: bold;
+    text-decoration: none;
+}
+.apidocDiv a[href]:hover {
+    text-decoration: underline;
+}
+.apidocCodeCommentSpan {
+    background: #bbf;
+    color: #000;
+    display: block;
+}
+.apidocCodeKeywordSpan {
+    color: #d00;
+    font-weight: bold;
+}
+.apidocCodePre {
+    background: #eef;
+    border: 1px solid;
+    color: #777;
+    padding: 5px;
+    white-space: pre-wrap;
+}
+.apidocFooterDiv {
+    margin-top: 20px;
+    text-align: center;
+}
+.apidocModuleLi {
+    margin-top: 10px;
+}
+.apidocSectionDiv {
+    border-top: 1px solid;
+    margin-top: 20px;
+}
+.apidocSignatureSpan {
+    color: #777;
+    font-weight: bold;
+}
+</style>
+<h1>api documentation for
+    <a
+
+        href="https://github.com/LiveSafe/gulp-html5-lint"
+
+    >gulp-html5-lint (v1.1.0)</a>
+</h1>
+<h4>gulp plugin for html5-lint</h4>
+<div class="apidocSectionDiv"><a
+    href="#apidoc.tableOfContents"
+    id="apidoc.tableOfContents"
+><h1>table of contents</h1></a><ol>
+
+    <li class="apidocModuleLi"><a href="#apidoc.module.gulp-html5-lint">module gulp-html5-lint</a><ol>
+
+        <li>
+
+            <a class="apidocElementLiA" href="#apidoc.element.gulp-html5-lint.gulp-html5-lint">
+            function <span class="apidocSignatureSpan"></span>gulp-html5-lint
+            <span class="apidocSignatureSpan">(options)</span>
+            </a>
+
+        </li>
+
+        <li>
+
+            <a class="apidocElementLiA" href="#apidoc.element.gulp-html5-lint.toString">
+            function <span class="apidocSignatureSpan">gulp-html5-lint.</span>toString
+            <span class="apidocSignatureSpan">()</span>
+            </a>
+
+        </li>
+
+    </ol></li>
+
+    <li class="apidocModuleLi"><a href="#apidoc.module.gulp-html5-lint.toString">module gulp-html5-lint.toString</a><ol>
+
+        <li>
+
+            <a class="apidocElementLiA" href="#apidoc.element.gulp-html5-lint.toString.toString">
+            function <span class="apidocSignatureSpan">gulp-html5-lint.</span>toString
+            <span class="apidocSignatureSpan">()</span>
+            </a>
+
+        </li>
+
+    </ol></li>
+
+</ol></div>
+
+<div class="apidocSectionDiv">
+<h1><a href="#apidoc.module.gulp-html5-lint" id="apidoc.module.gulp-html5-lint">module gulp-html5-lint</a></h1>
+
+
+    <h2>
+        <a href="#apidoc.element.gulp-html5-lint.gulp-html5-lint" id="apidoc.element.gulp-html5-lint.gulp-html5-lint">
+        function <span class="apidocSignatureSpan"></span>gulp-html5-lint
+        <span class="apidocSignatureSpan">(options)</span>
+        </a>
+    </h2>
+    <ul>
+    <li>description and source-code<pre class="apidocCodePre">function gulpHtml5Lint(options) {
+    var linterOpts = _.safeMerge({
+            apiCheck: {
+                timeout: moment.duration(10, &#x27;seconds&#x27;).asMilliseconds(),
+                triggerError: false
+            }
+        }, options),
+        errorOutputList = [],
+        req,
+        apiAvailable;
+
+    try {
+        req = request(&#x27;GET&#x27;, linterOpts.apiCheck.website || &#x27;https://html5.validator.nu&#x27;, {
+            timeout: linterOpts.apiCheck.timeout
+        });
+    }
+    catch (e) {
+        req = {
+            statusCode: 0
+        };
+    }
+    finally {
+        apiAvailable = req.statusCode === 200;
+    }
+
+    if (!apiAvailable &#x26;&#x26; !linterOpts.apiCheck.triggerError) {
+        gutil.log(&#x27;HTML lint API is DOWN. Skipping linting.&#x27;);
+    }
+
+    function transformFunction(file, enc, cb) {
+        if (file.isNull()) {
+            return cb(null, file);
+        }
+
+        if (!apiAvailable) {
+            if (linterOpts.apiCheck.triggerError) {
+                return cb(new PluginError(pluginName, &#x27;HTML lint API is down. Aborting.&#x27;));
+            }
+            return cb(null, file);
+        }
+
+        if (file.isStream()) {
+            return cb(new PluginError(pluginName, &#x27;Streaming not supported&#x27;));
+        }
+
+        try {
+            htmlLint(file.contents.toString(), linterOpts, function htmlLintCallback(err, results) {
+                _.forEach(results.messages, function(msg) {
+                    var errorMsg = msg.type + &#x27;: &#x27; + msg.message + &#x27;\n&#x27; +
+                        &#x27;    at &#x27; + file.path + &#x27;:&#x27; + msg.lastLine + &#x27;:&#x27; + msg.lastColumn;
+
+                    errorOutputList.push(errorMsg);
+                });
+
+                cb(null, file);
+            });
+        } catch (err) {
+            errorOutputList.push(err.toString());
+            cb(null, file);
+        }
+    }
+
+    function flushFunction(cb) {
+        if (!_.isEmpty(errorOutputList)) {
+<span class="apidocCodeCommentSpan">            /*jshint validthis:true */
+</span>            this.emit(&#x27;error&#x27;, new PluginError(pluginName, &#x27;\n&#x27; + errorOutputList.join(&#x27;\n\n&#x27;) + &#x27;\n&#x27;, {
+                showStack: false
+            }));
+        }
+        cb();
+    }
+
+    return through.obj(transformFunction, flushFunction);
+}</pre></li>
+    <li>example usage<pre class="apidocCodePre">n/a</pre></li>
+    </ul>
+
+
+
+    <h2>
+        <a href="#apidoc.element.gulp-html5-lint.toString" id="apidoc.element.gulp-html5-lint.toString">
+        function <span class="apidocSignatureSpan">gulp-html5-lint.</span>toString
+        <span class="apidocSignatureSpan">()</span>
+        </a>
+    </h2>
+    <ul>
+    <li>description and source-code<pre class="apidocCodePre">toString = function () {
+    return text;
+}</pre></li>
+    <li>example usage<pre class="apidocCodePre">n/a</pre></li>
+    </ul>
+
+
+</div>
+
+<div class="apidocSectionDiv">
+<h1><a href="#apidoc.module.gulp-html5-lint.toString" id="apidoc.module.gulp-html5-lint.toString">module gulp-html5-lint.toString</a></h1>
+
+
+    <h2>
+        <a href="#apidoc.element.gulp-html5-lint.toString.toString" id="apidoc.element.gulp-html5-lint.toString.toString">
+        function <span class="apidocSignatureSpan">gulp-html5-lint.</span>toString
+        <span class="apidocSignatureSpan">()</span>
+        </a>
+    </h2>
+    <ul>
+    <li>description and source-code<pre class="apidocCodePre">function toString() { [native code] }</pre></li>
+    <li>example usage<pre class="apidocCodePre">n/a</pre></li>
+    </ul>
+
+
+</div>
+
+<div class="apidocFooterDiv">
+    [ this document was created with
+    <a href="https://github.com/kaizhu256/node-utility2" target="_blank">utility2</a>
+    ]
+</div>
+</div>
