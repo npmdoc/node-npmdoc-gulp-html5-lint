@@ -1,4 +1,7 @@
-# api documentation for  [gulp-html5-lint (v1.1.0)](https://github.com/LiveSafe/gulp-html5-lint)  [![npm package](https://img.shields.io/npm/v/npmdoc-gulp-html5-lint.svg?style=flat-square)](https://www.npmjs.org/package/npmdoc-gulp-html5-lint) [![travis-ci.org build-status](https://api.travis-ci.org/npmdoc/node-npmdoc-gulp-html5-lint.svg)](https://travis-ci.org/npmdoc/node-npmdoc-gulp-html5-lint)
+# npmdoc-gulp-html5-lint
+
+#### basic api documentation for  [gulp-html5-lint (v1.1.0)](https://github.com/LiveSafe/gulp-html5-lint)  [![npm package](https://img.shields.io/npm/v/npmdoc-gulp-html5-lint.svg?style=flat-square)](https://www.npmjs.org/package/npmdoc-gulp-html5-lint) [![travis-ci.org build-status](https://api.travis-ci.org/npmdoc/node-npmdoc-gulp-html5-lint.svg)](https://travis-ci.org/npmdoc/node-npmdoc-gulp-html5-lint)
+
 #### gulp plugin for html5-lint
 
 [![NPM](https://nodei.co/npm/gulp-html5-lint.png?downloads=true&downloadRank=true&stars=true)](https://www.npmjs.com/package/gulp-html5-lint)
@@ -73,7 +76,8 @@
         "release": "./do-release.sh",
         "test": "gulp test"
     },
-    "version": "1.1.0"
+    "version": "1.1.0",
+    "bin": {}
 }
 ```
 
